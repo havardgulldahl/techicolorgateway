@@ -1,7 +1,8 @@
+import json
 import logging
 import re
 from dataclasses import dataclass
-from datetime import timedelta
+from datetime import datetime, timedelta
 from typing import Optional
 
 import html2text
@@ -78,6 +79,125 @@ def get_data_from_rows(data, rows):
         data.append(
             {"name": cols[name_index], "ip": cols[ip_index], "mac": cols[mac_index]}
         )
+
+
+@dataclass
+class NetworkDevice:
+    HostName: str
+    DhcpVendorClass: Optional[str]
+    DhcpLeaseIP: str
+    L3Interface: str
+    ConnectedTime: datetime
+    State: str
+    DhcpTag: str
+    DeviceType: Optional[str]
+    BytesSent: int
+    IPv6: Optional[str]
+    Port: Optional[str]
+    InterfaceType: str
+    Speed: Optional[str]
+    Priority: int
+    SSID: Optional[str]
+    DhcpLeaseTime: int
+    BytesReceived: int
+    Delete: str
+    Radio: Optional[str]
+    FriendlyName: str
+    IPAddress: str
+    PktsSent: int
+    FirewallZone: str
+    PktsReceived: int
+    MACAddress: str
+    L2Interface: str
+    LeaseType: str
+    ProductClass: Optional[str]
+    paramindex: str
+    HostType: Optional[str]
+    IPv4: str
+    LeaseTimeRemaining: int
+    interface_tag: str  # New field for the interface tag
+
+    @classmethod
+    def from_dict(cls, data: dict, interface_tag: str) -> "NetworkDevice":
+        # Convert ConnectedTime from Unix timestamp to datetime
+        connected_time = datetime.fromtimestamp(int(data["ConnectedTime"]))
+
+        # Convert numeric strings to appropriate types
+        return cls(
+            HostName=data["HostName"],
+            DhcpVendorClass=data["DhcpVendorClass"] or None,
+            DhcpLeaseIP=data["DhcpLeaseIP"],
+            L3Interface=data["L3Interface"],
+            ConnectedTime=connected_time,
+            State=data["State"],
+            DhcpTag=data["DhcpTag"],
+            DeviceType=data["DeviceType"] or None,
+            BytesSent=int(data["BytesSent"]),
+            IPv6=data["IPv6"] or None,
+            Port=data["Port"] or None,
+            InterfaceType=data["InterfaceType"],
+            Speed=data["Speed"] or None,
+            Priority=int(data["Priority"]),
+            SSID=data["SSID"] or None,
+            DhcpLeaseTime=int(data["DhcpLeaseTime"]),
+            BytesReceived=int(data["BytesReceived"]),
+            Delete=data["Delete"],
+            Radio=data["Radio"] or None,
+            FriendlyName=data["FriendlyName"],
+            IPAddress=data["IPAddress"],
+            PktsSent=int(data["PktsSent"]),
+            FirewallZone=data["FirewallZone"],
+            PktsReceived=int(data["PktsReceived"]),
+            MACAddress=data["MACAddress"],
+            L2Interface=data["L2Interface"],
+            LeaseType=data["LeaseType"],
+            ProductClass=data["ProductClass"] or None,
+            paramindex=data["paramindex"],
+            HostType=data["HostType"] or None,
+            IPv4=data["IPv4"],
+            LeaseTimeRemaining=int(data["LeaseTimeRemaining"]),
+            interface_tag=interface_tag,  # Add the interface tag
+        )
+
+
+def get_network_devices(content):
+    """Parse the network devices from the javascript content."""
+    soup = BeautifulSoup(content, "html.parser")
+
+    # Find the script tag containing our data
+    script = soup.find("script", text=re.compile("var ethernet_data"))
+
+    if not script:
+        raise ValueError("Could not find the required script tag in the HTML")
+
+    # Extract JavaScript variables
+    js_vars = {}
+    for var in [
+        "ethernet_data",
+        "wifi2_data",
+        "wifi5_data",
+        "guest_wifi2_data",
+        "guest_wifi5_data",
+    ]:
+        match = re.search(rf"var {var} = (\[.*?\]);", script.string, re.DOTALL)
+        if match:
+            js_vars[var] = json.loads(match.group(1))
+        else:
+            js_vars[var] = []
+
+    devices = []
+    data_sources = [
+        (js_vars.get("ethernet_data", []), "ethernet"),
+        (js_vars.get("wifi2_data", []), "wifi2"),
+        (js_vars.get("wifi5_data", []), "wifi5"),
+        (js_vars.get("guest_wifi2_data", []), "guest_wifi2"),
+        (js_vars.get("guest_wifi5_data", []), "guest_wifi5"),
+    ]
+
+    for data_list, interface_tag in data_sources:
+        for device_data in data_list:
+            devices.append(NetworkDevice.from_dict(device_data, interface_tag))
+    return devices
 
 
 @dataclass
@@ -189,6 +309,8 @@ class DiagnosticsConnectionModal:
     def parse_ping(ping_string: Optional[str]) -> Optional[bool]:
         """Parse a ping result string into a boolean"""
         if ping_string is None:
+            return None
+        elif ping_string == "Ongoing":
             return None
         return ping_string == "Success"
 

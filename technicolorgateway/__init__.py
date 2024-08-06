@@ -12,6 +12,7 @@ from technicolorgateway.modal import (
     get_broadband_modal,
     get_system_info_modal,
     get_diagnostics_connection_modal,
+    get_network_devices,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -97,6 +98,12 @@ class TechnicolorGateway:
         _LOGGER.debug(f"{content[:30]}")
         _LOGGER.debug(f"{content[:-30]}")
         return get_device_modal(content)
+
+    def get_network_device_details(self):
+        req = self._br.session.get(f"{self._uri}/modals/device-modal.lp")
+        self._br._update_state(req)
+        content = req.content.decode()
+        return get_network_devices(content)
 
     def get_broadband_modal(self):
         req = self._br.session.get(f"{self._uri}/modals/broadband-modal.lp")
