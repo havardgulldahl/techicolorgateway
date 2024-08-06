@@ -1,30 +1,31 @@
-## Technicolor Gateway Scraper library
+## Technicolor Gateway Scraper library 
+## Feature fork
 
-This is a library to use in order to scrape Technicolor Gateway
-
-![python package workflow](https://github.com/shaiu/techicolorgateway/actions/workflows/python-package.yml/badge.svg)
-
-
-### Installation
-
-
-`pip install pytechnicolor`
-
+This is a fork of https://github.com/shaiu/techicolorgateway with the intention to expose everything from the web gui that makes sense to add. 
 
 ### How to use it
 
 
+    import technicolorgateway
+    import os
 
-```
-from technicolorgateway import TechnicolorGateway
-    
-gateway = TechnicolorGateway("192.168.1.1", "80", "user", "pass")
-  
-gateway.srp6authenticate()
-  
-devices = gateway.get_device_modal()
-  
-broadband = gateway.get_broadband_modal()
-```
+    # Get the router's details from environment variables
+    router_ip = os.getenv("ROUTER_IP", "192.168.1.1")
+    router_port = os.getenv("ROUTER_PORT", "80")
+    router_user = os.getenv("ROUTER_USER", "User")
+    router_password = os.getenv("ROUTER_PASSWORD", "admin")
+
+
+    router = technicolorgateway.TechnicolorGateway(
+        router_ip, router_port, router_user, router_password
+    )
+    router.authenticate()
+
+    # print all information about the router
+
+    print(router.get_broadband_modal())
+    print(router.get_device_modal())
+    print(router.get_system_info_modal())
+    print(router.get_diagnostics_connection_modal())
  
-Credits to: https://github.com/mswhirl/TechnicolorStatScraper
+
