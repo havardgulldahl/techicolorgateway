@@ -114,21 +114,22 @@ class TestModal:
         modal_dict = get_system_info_modal(content)
         print("\n")
         print(modal_dict)
-        assert len(modal_dict) == 11
-        assert modal_dict["Product Vendor"] == "Technicolor"
-        assert modal_dict["Product Name"] == "Telia F1"
-        assert modal_dict["Serial Number"] == "CP2221ADU9K"
-        assert modal_dict["Software Version"] == "19.5"
+        assert isinstance(modal_dict, SystemInfo)
+        assert modal_dict.product_vendor == "Technicolor"
+        assert modal_dict.product_name == "Telia F1"
+        assert modal_dict.serial_number == "CP2221ADU9K"
+        assert modal_dict.software_version == "19.5"
         assert (
-            modal_dict["Uptime since last reboot"]
+            modal_dict.uptime_since_last_reboot
             == "19 days 6 hours 13 minutes 8 seconds"
         )
-        assert modal_dict["Firmware Version"] == "19.5.1062-4581003"
-        assert modal_dict["Hardware Version"] == "GCNT-X"
-        assert modal_dict["MAC Address"] == "AA:BB:CC:45:18:0E"
-        assert modal_dict["Memory Usage"] == "86 %"
-        assert modal_dict["CPU Usage"] == "2 %"
-        assert modal_dict["Reboot Cause"] == "Power"
+        assert modal_dict.uptime == timedelta(days=19, seconds=22388)
+        assert modal_dict.firmware_version == "19.5.1062-4581003"
+        assert modal_dict.hardware_version == "GCNT-X"
+        assert modal_dict.mac_address == "AA:BB:CC:45:18:0E"
+        assert modal_dict.memory_usage == 0.86
+        assert modal_dict.cpu_usage == 0.02
+        assert modal_dict.reboot_cause == "Power"
 
     def test_get_diagnostics_connection_modal(self):
         with open(
@@ -157,38 +158,38 @@ class TestModal:
             assert isinstance(device, NetworkDevice)
 
         device = devices[0]
-        assert device.HostName == "Device1"
-        assert device.DhcpVendorClass == "udhcp 0.9.8"
-        assert device.DhcpLeaseIP == "192.168.1.10"
-        assert device.L3Interface == "br-lan"
-        assert device.ConnectedTime == datetime.fromtimestamp(1721497366)
-        assert device.State == "1"
-        assert device.DhcpTag == "lan known br-lan"
-        assert device.DeviceType == "router"
-        assert device.BytesSent == 0
-        assert device.IPv6 == None
-        assert device.Port == "1"
-        assert device.InterfaceType == "ethernet"
-        assert device.Speed == "1000"
-        assert device.Priority == 0
-        assert device.SSID == None
-        assert device.DhcpLeaseTime == 3600
-        assert device.BytesReceived == 0
-        assert device.Delete == "0"
-        assert device.Radio == None
-        assert device.FriendlyName == "Device1"
-        assert device.IPAddress == "192.168.1.10"
-        assert device.PktsSent == 0
-        assert device.FirewallZone == "LAN"
-        assert device.PktsReceived == 0
-        assert device.MACAddress == "XX:XX:XX:XX:XX:XX"
-        assert device.L2Interface == "eth0"
-        assert device.LeaseType == "Static"
-        assert device.ProductClass == None
+        assert device.host_name == "Device1"
+        assert device.dhcp_vendor_class == "udhcp 0.9.8"
+        assert device.dhcp_lease_ip == "192.168.1.10"
+        assert device.l3_interface == "br-lan"
+        assert device.connected_time == datetime.fromtimestamp(1721497366)
+        assert device.state == "1"
+        assert device.dhcp_tag == "lan known br-lan"
+        assert device.device_type == "router"
+        assert device.bytes_sent == 0
+        assert device.ipv6 == None
+        assert device.port == "1"
+        assert device.interface_type == "ethernet"
+        assert device.speed == "1000"
+        assert device.priority == 0
+        assert device.ssid == None
+        assert device.dhcp_lease_time == 3600
+        assert device.bytes_received == 0
+        assert device.delete == "0"
+        assert device.radio == None
+        assert device.friendly_name == "Device1"
+        assert device.ip_address == "192.168.1.10"
+        assert device.pkts_sent == 0
+        assert device.firewall_zone == "LAN"
+        assert device.pkts_received == 0
+        assert device.mac_address == "XX:XX:XX:XX:XX:XX"
+        assert device.l2_interface == "eth0"
+        assert device.lease_type == "Static"
+        assert device.product_class == None
         assert device.paramindex == "2"
-        assert device.HostType == None
-        assert device.IPv4 == "192.168.1.10"
-        assert device.LeaseTimeRemaining == 2110
+        assert device.host_type == None
+        assert device.ipv4 == "192.168.1.10"
+        assert device.lease_time_remaining == 2110
         assert device.interface_tag == "ethernet"
         assert device.is_ethernet == True
         assert device.is_guest == False
@@ -196,38 +197,38 @@ class TestModal:
         assert device.is_24ghz == False
 
         device2 = devices[4]
-        assert device2.HostName == "Device8"
-        assert device2.DhcpVendorClass == None
-        assert device2.DhcpLeaseIP == "192.168.1.222"
-        assert device2.L3Interface == "br-lan"
-        assert device2.ConnectedTime == datetime.fromtimestamp(1722901121)
-        assert device2.State == "1"
-        assert device2.DhcpTag == "lan br-lan"
-        assert device2.DeviceType == None
-        assert device2.BytesSent == 0
-        assert device2.IPv6 == None
-        assert device2.Port == None
-        assert device2.InterfaceType == "wireless"
-        assert device2.Speed == None
-        assert device2.Priority == 0
-        assert device2.SSID == "XX-XXXX"
-        assert device2.DhcpLeaseTime == 3600
-        assert device2.BytesReceived == 0
-        assert device2.Delete == "0"
-        assert device2.Radio == "radio_5G"
-        assert device2.FriendlyName == "Device9"
-        assert device2.IPAddress == "192.168.1.222"
-        assert device2.PktsSent == 0
-        assert device2.FirewallZone == "LAN"
-        assert device2.PktsReceived == 0
-        assert device2.MACAddress == "XX:XX:XX:XX:XX:XX"
-        assert device2.L2Interface == "wds1_2_2.10"
-        assert device2.LeaseType == "DHCP"
-        assert device2.ProductClass == None
+        assert device2.host_name == "Device8"
+        assert device2.dhcp_vendor_class == None
+        assert device2.dhcp_lease_ip == "192.168.1.222"
+        assert device2.l3_interface == "br-lan"
+        assert device2.connected_time == datetime.fromtimestamp(1722901121)
+        assert device2.state == "1"
+        assert device2.dhcp_tag == "lan br-lan"
+        assert device2.device_type == None
+        assert device2.bytes_sent == 0
+        assert device2.ipv6 == None
+        assert device2.port == None
+        assert device2.interface_type == "wireless"
+        assert device2.speed == None
+        assert device2.priority == 0
+        assert device2.ssid == "XX-XXXX"
+        assert device2.dhcp_lease_time == 3600
+        assert device2.bytes_received == 0
+        assert device2.delete == "0"
+        assert device2.radio == "radio_5G"
+        assert device2.friendly_name == "Device9"
+        assert device2.ip_address == "192.168.1.222"
+        assert device2.pkts_sent == 0
+        assert device2.firewall_zone == "LAN"
+        assert device2.pkts_received == 0
+        assert device2.mac_address == "XX:XX:XX:XX:XX:XX"
+        assert device2.l2_interface == "wds1_2_2.10"
+        assert device2.lease_type == "DHCP"
+        assert device2.product_class == None
         assert device2.paramindex == "11"
-        assert device2.HostType == None
-        assert device2.IPv4 == "192.168.1.222"
-        assert device2.LeaseTimeRemaining == 2145
+        assert device2.host_type == None
+        assert device2.ipv4 == "192.168.1.222"
+        assert device2.lease_time_remaining == 2145
         assert device2.interface_tag == "wifi5"
         assert device2.is_ethernet == False
         assert device2.is_guest == False

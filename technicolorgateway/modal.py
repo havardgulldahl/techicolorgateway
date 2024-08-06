@@ -83,38 +83,38 @@ def get_data_from_rows(data, rows):
 
 @dataclass
 class NetworkDevice:
-    HostName: str
-    DhcpVendorClass: Optional[str]
-    DhcpLeaseIP: str
-    L3Interface: str
-    ConnectedTime: datetime
-    State: str
-    DhcpTag: str
-    DeviceType: Optional[str]
-    BytesSent: int
-    IPv6: Optional[str]
-    Port: Optional[str]
-    InterfaceType: str
-    Speed: Optional[str]
-    Priority: int
-    SSID: Optional[str]
-    DhcpLeaseTime: int
-    BytesReceived: int
-    Delete: str
-    Radio: Optional[str]
-    FriendlyName: str
-    IPAddress: str
-    PktsSent: int
-    FirewallZone: str
-    PktsReceived: int
-    MACAddress: str
-    L2Interface: str
-    LeaseType: str
-    ProductClass: Optional[str]
+    host_name: str
+    dhcp_vendor_class: Optional[str]
+    dhcp_lease_ip: str
+    l3_interface: str
+    connected_time: datetime
+    state: str
+    dhcp_tag: str
+    device_type: Optional[str]
+    bytes_sent: int
+    ipv6: Optional[str]
+    port: Optional[str]
+    interface_type: str
+    speed: Optional[str]
+    priority: int
+    ssid: Optional[str]
+    dhcp_lease_time: int
+    bytes_received: int
+    delete: str
+    radio: Optional[str]
+    friendly_name: str
+    ip_address: str
+    pkts_sent: int
+    firewall_zone: str
+    pkts_received: int
+    mac_address: str
+    l2_interface: str
+    lease_type: str
+    product_class: Optional[str]
     paramindex: str
-    HostType: Optional[str]
-    IPv4: str
-    LeaseTimeRemaining: int
+    host_type: Optional[str]
+    ipv4: str
+    lease_time_remaining: int
     interface_tag: str  # New field for the interface tag
     is_ethernet: bool = False
     is_guest: bool = False
@@ -128,38 +128,38 @@ class NetworkDevice:
 
         # Convert numeric strings to appropriate types
         return cls(
-            HostName=data["HostName"],
-            DhcpVendorClass=data["DhcpVendorClass"] or None,
-            DhcpLeaseIP=data["DhcpLeaseIP"],
-            L3Interface=data["L3Interface"],
-            ConnectedTime=connected_time,
-            State=data["State"],
-            DhcpTag=data["DhcpTag"],
-            DeviceType=data["DeviceType"] or None,
-            BytesSent=int(data["BytesSent"]),
-            IPv6=data["IPv6"] or None,
-            Port=data["Port"] or None,
-            InterfaceType=data["InterfaceType"],
-            Speed=data["Speed"] or None,
-            Priority=int(data["Priority"]),
-            SSID=data["SSID"] or None,
-            DhcpLeaseTime=int(data["DhcpLeaseTime"]),
-            BytesReceived=int(data["BytesReceived"]),
-            Delete=data["Delete"],
-            Radio=data["Radio"] or None,
-            FriendlyName=data["FriendlyName"],
-            IPAddress=data["IPAddress"],
-            PktsSent=int(data["PktsSent"]),
-            FirewallZone=data["FirewallZone"],
-            PktsReceived=int(data["PktsReceived"]),
-            MACAddress=data["MACAddress"],
-            L2Interface=data["L2Interface"],
-            LeaseType=data["LeaseType"],
-            ProductClass=data["ProductClass"] or None,
+            host_name=data["HostName"],
+            dhcp_vendor_class=data["DhcpVendorClass"] or None,
+            dhcp_lease_ip=data["DhcpLeaseIP"],
+            l3_interface=data["L3Interface"],
+            connected_time=connected_time,
+            state=data["State"],
+            dhcp_tag=data["DhcpTag"],
+            device_type=data["DeviceType"] or None,
+            bytes_sent=int(data["BytesSent"]),
+            ipv6=data["IPv6"] or None,
+            port=data["Port"] or None,
+            interface_type=data["InterfaceType"],
+            speed=data["Speed"] or None,
+            priority=int(data["Priority"]),
+            ssid=data["SSID"] or None,
+            dhcp_lease_time=int(data["DhcpLeaseTime"]),
+            bytes_received=int(data["BytesReceived"]),
+            delete=data["Delete"],
+            radio=data["Radio"] or None,
+            friendly_name=data["FriendlyName"],
+            ip_address=data["IPAddress"],
+            pkts_sent=int(data["PktsSent"]),
+            firewall_zone=data["FirewallZone"],
+            pkts_received=int(data["PktsReceived"]),
+            mac_address=data["MACAddress"],
+            l2_interface=data["L2Interface"],
+            lease_type=data["LeaseType"],
+            product_class=data["ProductClass"] or None,
             paramindex=data["paramindex"],
-            HostType=data["HostType"] or None,
-            IPv4=data["IPv4"],
-            LeaseTimeRemaining=int(data["LeaseTimeRemaining"]),
+            host_type=data["HostType"] or None,
+            ipv4=data["IPv4"],
+            lease_time_remaining=int(data["LeaseTimeRemaining"]),
             interface_tag=interface_tag,  # Add the interface tag,
             is_ethernet="ethernet" in interface_tag,
             is_guest="guest" in interface_tag,
