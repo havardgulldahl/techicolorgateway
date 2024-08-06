@@ -116,6 +116,10 @@ class NetworkDevice:
     IPv4: str
     LeaseTimeRemaining: int
     interface_tag: str  # New field for the interface tag
+    is_ethernet: bool = False
+    is_guest: bool = False
+    is_5ghz: bool = False
+    is_24ghz: bool = False
 
     @classmethod
     def from_dict(cls, data: dict, interface_tag: str) -> "NetworkDevice":
@@ -156,7 +160,11 @@ class NetworkDevice:
             HostType=data["HostType"] or None,
             IPv4=data["IPv4"],
             LeaseTimeRemaining=int(data["LeaseTimeRemaining"]),
-            interface_tag=interface_tag,  # Add the interface tag
+            interface_tag=interface_tag,  # Add the interface tag,
+            is_ethernet="ethernet" in interface_tag,
+            is_guest="guest" in interface_tag,
+            is_5ghz="wifi5" in interface_tag,
+            is_24ghz="wifi2" in interface_tag,
         )
 
 
@@ -201,7 +209,7 @@ def get_network_devices(content):
 
 
 @dataclass
-class SystemInfoModal:
+class SystemInfo:
     product_vendor: Optional[str]
     product_name: Optional[str]
     serial_number: Optional[str]
@@ -261,8 +269,8 @@ class SystemInfoModal:
         return float(match.group(1)) / 100 if match else None
 
     @classmethod
-    def from_dict(cls, data: dict) -> "SystemInfoModal":
-        """Create a SystemInfoModal instance from a dictionary."""
+    def from_dict(cls, data: dict) -> "SystemInfo":
+        """Create a SystemInfo instance from a dictionary."""
         uptime_str = data.get("Uptime since last reboot")
         return cls(
             product_vendor=data.get("Product Vendor"),
@@ -292,11 +300,11 @@ def get_system_info_modal(content):
             value = span.text.strip()
             data[key] = value
 
-    return SystemInfoModal.from_dict(data)
+    return SystemInfo.from_dict(data)
 
 
 @dataclass
-class DiagnosticsConnectionModal:
+class DiagnosticsConnection:
     wan_enable: Optional[str]
     wan_available: Optional[str]
     ip_version_4_address: Optional[str]
@@ -315,8 +323,8 @@ class DiagnosticsConnectionModal:
         return ping_string == "Success"
 
     @classmethod
-    def from_dict(cls, data: dict) -> "DiagnosticsConnectionModal":
-        """Create a DiagnosticsConnectionModal instance from a dictionary."""
+    def from_dict(cls, data: dict) -> "DiagnosticsConnection":
+        """Create a DiagnosticsConnection instance from a dictionary."""
         return cls(
             wan_enable=data.get("WAN Enable"),
             wan_available=data.get("WAN Available"),
@@ -328,7 +336,7 @@ class DiagnosticsConnectionModal:
         )
 
 
-def get_diagnostics_connection_modal(content: str) -> DiagnosticsConnectionModal:
+def get_diagnostics_connection_modal(content: str) -> DiagnosticsConnection:
     soup = BeautifulSoup(content, "html.parser")
     diagnostics_info = {}
     for div in soup.select("div.control-group"):
@@ -339,4 +347,4 @@ def get_diagnostics_connection_modal(content: str) -> DiagnosticsConnectionModal
             value = span.text.strip()
             diagnostics_info[key] = value
 
-    return DiagnosticsConnectionModal.from_dict(diagnostics_info)
+    return DiagnosticsConnection.from_dict(diagnostics_info)
