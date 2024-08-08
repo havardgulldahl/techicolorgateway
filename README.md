@@ -29,3 +29,7 @@ This is a fork of https://github.com/shaiu/techicolorgateway with the intention 
     print(router.get_diagnostics_connection_modal())
  
 
+
+## TODO
+
+- Integrate https://github.com/Ansuel/tch-nginx-gui
