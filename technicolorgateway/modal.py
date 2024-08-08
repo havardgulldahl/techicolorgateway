@@ -30,7 +30,11 @@ def get_broadband_modal(content):
     body = h.handle(content)
     body = body[body.find("DSL Status") : body.find("Close")]
     body = body.replace("_", "").replace("\n", " ")
-    return regex_broadband_modal.search(body).groupdict()
+    try:
+        return regex_broadband_modal.search(body).groupdict()
+    except AttributeError:
+        _LOGGER.error("Could not parse broadband modal")
+        return {"us": None, "ds": None, "uploaded": None, "downloaded": None}
 
 
 def get_device_modal(content):
