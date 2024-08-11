@@ -19,6 +19,8 @@ _LOGGER = logging.getLogger(__name__)
 
 __version__ = "1.2"
 
+USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (XHTML, like Gecko) Version/17.6 Safari/605.1.15"
+
 
 class TechnicolorGateway:
     def __init__(self, host, port, user, password) -> None:
@@ -27,16 +29,36 @@ class TechnicolorGateway:
         self._uri = f'http://{host}:{port}'
         self._user = user
         self._password = password
-        self._br = RoboBrowser(history=True, parser="html.parser")
+        self._csrf_token = None
+        self._br = RoboBrowser(
+            history=True, parser="html.parser", user_agent=USER_AGENT
+        )
+        self._br.session.headers.update(
+            {"Referer": self._uri, "X-Requested-With": "XMLHttpRequest"}
+        )
 
     def srp6authenticate(self):
 
         self._br.open(self._uri)
-        token_tag = self._br.find(lambda tag: tag.has_attr('name') and tag['name'] == 'CSRFtoken')
-        token = token_tag['content']
-        _LOGGER.debug('Got CSRF token: %s', token)
+        _LOGGER.debug(f"Conn status: {self._br.response.status_code}")
+        if self._br.response.status_code == 503:
+            _LOGGER.error("Router returned HTTP status 503")
+            # TODO: handle or raise?
+            raise Exception("Router is not accepting connections")
+        token_tag = self._br.find(
+            lambda tag: tag.has_attr("name") and tag["name"] == "CSRFtoken"
+        )
+        try:
+            token = token_tag["content"]
+            _LOGGER.debug("Got CSRF token: %s", token)
+            self._csrf_token = token
+        except TypeError as e:
+            _LOGGER.error("Could not find CSRF token in response")
+            raise Exception("Could not find CSRF token in response") from e
 
-        usr = srp.User(self._user, self._password, hash_alg=srp.SHA256, ng_type=srp.NG_2048)
+        usr = srp.User(
+            self._user, self._password, hash_alg=srp.SHA256, ng_type=srp.NG_2048
+        )
         uname, A = usr.start_authentication()
         _LOGGER.debug('A value %s', binascii.hexlify(A))
 
