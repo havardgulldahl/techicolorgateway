@@ -3,6 +3,10 @@
 
 This is a fork of https://github.com/shaiu/techicolorgateway with the intention to expose everything from the web gui that makes sense to add. 
 
+Device tested: 
+
+- Telia F1 (Technicolor EWA1330)
+
 ### How to use it
 
 
@@ -28,8 +32,11 @@ This is a fork of https://github.com/shaiu/techicolorgateway with the intention 
     print(router.get_system_info_modal())
     print(router.get_diagnostics_connection_modal())
  
+    router.logout()
 
 
 ## TODO
 
-- Integrate https://github.com/Ansuel/tch-nginx-gui
+[ ] Integrate https://github.com/Ansuel/tch-nginx-gui
+[ ] Integrate http://192.168.1.1/modals/logviewer-modal.lp?process=miniupnpd
+[ ] Investigate the Smart Control app, and its requests to control.telia.zone   (e.g. https://control.telia.zone/api/v1/events/?transport=polling&b64=1&EIO=4)
