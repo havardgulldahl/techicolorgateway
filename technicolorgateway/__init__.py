@@ -168,3 +168,11 @@ class TechnicolorGateway:
         self._br._update_state(req)
         content = req.content.decode()
         return get_diagnostics_connection_modal(content)
+
+    def logout(self):
+        self._br.session.post(
+            f"{self._uri}/", data={"CSRFtoken": self._csrf_token, "do_signout": 1}
+        )
+        self._br = RoboBrowser(
+            history=True, parser="html.parser", user_agent=USER_AGENT
+        )
