@@ -1,9 +1,12 @@
 import ipaddress
+import logging
 import re
 from dataclasses import Field, dataclass
 from datetime import datetime, timedelta
 
 import macaddress
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -52,6 +55,20 @@ class NetworkDevice:
         # Convert ConnectedTime from Unix timestamp to datetime
         connected_time = datetime.fromtimestamp(int(data["ConnectedTime"]))
 
+        logger.debug(f"Creating NetworkDevice from data: {data}")
+
+        # Sometimes both the ipv4 and the IPaddress field contain two ip addresses
+        # This seems like a bug in the router's API
+        # On those occasions, the DhcpLeaseIP field is observed with one IP address
+        try:
+            ipv4 = ipaddress.IPv4Address(data["IPv4"]) if data["IPv4"] else None
+        except ipaddress.AddressValueError:
+            ipv4 = (
+                ipaddress.IPv4Address(data["DhcpLeaseIP"])
+                if data["DhcpLeaseIP"]
+                else None
+            )
+
         # Convert numeric strings to appropriate types
         return cls(
             host_name=data["HostName"],
@@ -67,7 +84,7 @@ class NetworkDevice:
             dhcp_tag=data["DhcpTag"],
             device_type=data["DeviceType"] or None,
             bytes_sent=int(data["BytesSent"]),
-            ipv4=ipaddress.IPv4Address(data["IPv4"]) if data["IPv4"] else None,
+            ipv4=ipv4,
             ipv6=ipaddress.IPv6Address(data["IPv6"]) if data["IPv6"] else None,
             port=data["Port"] or None,
             interface_type=data["InterfaceType"],
@@ -79,9 +96,7 @@ class NetworkDevice:
             delete=data["Delete"],
             radio=data["Radio"] or None,
             friendly_name=data["FriendlyName"],
-            ip_address=(
-                ipaddress.IPv4Address(data["IPAddress"]) if data["IPAddress"] else None
-            ),
+            ip_address=ipv4,
             pkts_sent=int(data["PktsSent"]),
             firewall_zone=data["FirewallZone"],
             pkts_received=int(data["PktsReceived"]),
